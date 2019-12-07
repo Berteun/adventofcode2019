@@ -178,7 +178,11 @@ class Machine:
         if not self.halted:
             opcode = self.decode(self.instructions[self.pos])
             self.pos += 1
-            opcode.eval()
+            try:
+                opcode.eval()
+            except:
+                self.halted = True
+                return
             self.halted = (self.instructions[self.pos] == 99)
 
     
@@ -196,6 +200,7 @@ class Machine:
                 next_input = yield self.output_value
                 self.output_value = None
                 self.input.append(next_input)
+        yield None
 
 def read_input():
     f = open("input_day07.txt")
@@ -213,26 +218,21 @@ def run():
         for _ in range(5):
             machines.append(Machine(input_list[:]))
 
-        try:
-            prev = 0
-            for i in range(5):
-                generators.append(machines[i].run([perm[i], prev]))
-                prev = next(generators[i])
+        prev = 0
+        for i in range(5):
+            generators.append(machines[i].run([perm[i], prev]))
+            prev = next(generators[i])
 
-            while not (all(machine.halted for machine in machines)):
-                for i in range(5):
-                    if not machines[i].halted:
-                        try:
-                            prev = generators[i].send(prev);
-                        except StopIteration:
-                            pass
+        i = 0
+        while not (all(machine.halted for machine in machines)):
+            if not machines[i].halted:
+                prev = generators[i].send(prev);
 
-                if prev is not None and prev > best:
-                    best = prev
-                    best_perm = perm
+            if i == 4 and prev > best:
+                best = prev
+                best_perm = perm
 
-        except IndexError:
-            pass
+            i = (i + 1) % 5
 
     print("best", best, best_perm)
 
