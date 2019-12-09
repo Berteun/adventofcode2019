@@ -27,7 +27,8 @@ class Add:
         vals = machine.get_args(self.arguments)
         array = machine.instructions
         r = [self.args[i].get(machine, vals[i]) for i in range(self.arguments)]
-        array[vals[2]] = r[0] + r[1]
+        output_addr = vals[2] if self.args[2].mode == 0 else vals[2] + machine.offset
+        array[output_addr] = r[0] + r[1]
         machine.pos += self.arguments
 
 class Mul:
@@ -43,7 +44,8 @@ class Mul:
         vals = machine.get_args(self.arguments)
         array = machine.instructions
         r = [self.args[i].get(machine, vals[i]) for i in range(self.arguments)]
-        array[vals[2]] = r[0] * r[1]
+        output_addr = vals[2] if self.args[2].mode == 0 else vals[2] + machine.offset
+        array[output_addr] = r[0] * r[1]
         machine.pos += self.arguments
 
 class Input:
@@ -59,7 +61,8 @@ class Input:
         vals = machine.get_args(self.arguments)
         array = machine.instructions
         r = [self.args[i].get(machine, vals[i]) for i in range(self.arguments)]
-        array[vals[0]] = machine.get_input()
+        output_addr = vals[0] if self.args[0].mode == 0 else vals[0] + machine.offset
+        array[output_addr] = machine.get_input()
         machine.pos += self.arguments
 
 
@@ -76,7 +79,8 @@ class Output:
         vals = machine.get_args(self.arguments)
         array = machine.instructions
         r = [self.args[i].get(machine, vals[i]) for i in range(self.arguments)]
-        machine.output(r[0])
+        output_addr = vals[0] if self.args[0].mode == 0 else vals[0] + machine.offset
+        machine.output(array[output_addr])
         machine.pos += self.arguments
 
 class JumpIfTrue:
@@ -128,7 +132,8 @@ class LessThan:
         vals = machine.get_args(self.arguments)
         array = machine.instructions
         r = [self.args[i].get(machine, vals[i]) for i in range(self.arguments)]
-        array[vals[2]] = int(r[0] < r[1])
+        output_addr = vals[2] if self.args[2].mode == 0 else vals[2] + machine.offset
+        array[output_addr] = int(r[0] < r[1])
         machine.pos += self.arguments
 
 class Equals:
@@ -144,7 +149,8 @@ class Equals:
         vals = machine.get_args(self.arguments)
         array = machine.instructions
         r = [self.args[i].get(machine, vals[i]) for i in range(self.arguments)]
-        array[vals[2]] = int(r[0] == r[1])
+        output_addr = vals[2] if self.args[2].mode == 0 else vals[2] + machine.offset
+        array[output_addr] = int(r[0] == r[1])
         machine.pos += self.arguments
 
 class SetBase:
@@ -158,7 +164,6 @@ class SetBase:
     def eval(self):
         machine = self.machine
         vals = machine.get_args(self.arguments)
-        array = machine.instructions
         r = [self.args[i].get(machine, vals[i]) for i in range(self.arguments)]
         machine.offset += r[0]
         machine.pos += self.arguments
@@ -194,7 +199,7 @@ class Machine:
         opcode = code % 100;
         code //= 100;
         args = []
-        for n in range(opcodes[opcode].arguments):        
+        for n in range(opcodes[opcode].arguments):
             mode = code % 10
             args.append(Argument(mode))
             code //= 10
@@ -207,10 +212,10 @@ class Machine:
             opcode.eval()
             self.halted = (self.instructions[self.pos] == 99)
 
-    
+
     def get_input(self):
         return self.input.pop(0)
-    
+
     def output(self, value):
         self.output_value = value
 
@@ -228,6 +233,7 @@ def read_input():
     l = [int(n) for n in f.readline().strip().split(",")]
     #l = [109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99]
     #l = [1102,34915192,34915192,7,4,7,99,0]
+    #l = [104,1125899906842624,99]
     return l
 
 def run():
