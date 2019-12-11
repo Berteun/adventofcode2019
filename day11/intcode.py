@@ -1,7 +1,7 @@
 import operator
 from enum import Enum
 
-AddressingMode =Enum('AddressingMode', 'POS IMM REL', start=0)
+Mode = Enum('Mode', 'POS IMM REL', start=0)
 Opcode = Enum('Opcode', 'Add Mul Input Output JumpIfTrue JumpIfFalse LessThan Equals SetBase')
 
 class IntCodeMachine:
@@ -13,15 +13,14 @@ class IntCodeMachine:
 
     def decode_next(self, instruction):
         mode_code, opcode = divmod(instruction, 100)
-        modes = [AddressingMode((mode_code // 10**n) % 10) for n in range(3)]
+        modes = [Mode((mode_code // 10**n) % 10) for n in range(3)]
         return Opcode(opcode), modes
 
     def step(self):
-        if not self.halted:
-            opcode, modes = self.decode_next(self.memory[self.pos])
-            self.pos += 1
-            self.eval(opcode, modes)
-            self.halted = (self.memory[self.pos] == 99)
+        opcode, modes = self.decode_next(self.memory[self.pos])
+        self.pos += 1
+        self.eval(opcode, modes)
+        self.halted = (self.memory[self.pos] == 99)
 
     def run(self):
         while not self.halted:
@@ -29,9 +28,9 @@ class IntCodeMachine:
 
     def get_arg(self, mode, val):
         return {
-            AddressingMode.POS: lambda val: self.memory[val],
-            AddressingMode.IMM: lambda val: val,
-            AddressingMode.REL: lambda val: self.memory[self.offset + val],
+            Mode.POS: lambda val: self.memory[val],
+            Mode.IMM: lambda val: val,
+            Mode.REL: lambda val: self.memory[self.offset + val],
         }[mode](val)
 
     def get_args(self, n, modes):
@@ -39,7 +38,7 @@ class IntCodeMachine:
     
     def get_args_and_output(self, n, modes):
         args, addr = self.get_args(n, modes), self.memory[self.pos + n]
-        oaddr = addr + (self.offset if modes[n] == AddressingMode.REL else 0)
+        oaddr = addr + (self.offset if modes[n] == Mode.REL else 0)
         return args + (oaddr,)
 
     def eval_op(self, operator, modes):
