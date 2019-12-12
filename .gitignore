@@ -108,4 +108,5 @@ Cargo.lock
 **/*.rs.bk
 
 input_day*.txt
+example*.txt
 *.swp
