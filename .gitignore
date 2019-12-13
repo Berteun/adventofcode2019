@@ -107,5 +107,6 @@ venv.bak/
 Cargo.lock
 **/*.rs.bk
 
+example*.txt
 input_day*.txt
 *.swp
