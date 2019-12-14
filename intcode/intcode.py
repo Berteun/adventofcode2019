@@ -48,7 +48,7 @@ class IntCodeMachine:
 
     def eval_jump(self, cond, modes):
         (arg, dest) = self.get_args(2, modes)
-        self.pos = dest if arg == cond else self.pos + 2
+        self.pos = dest if bool(arg) == cond else self.pos + 2
 
     def eval_inp(self, modes):
         (oaddr,) = self.get_args_and_output(0, modes)
