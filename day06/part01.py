@@ -5,7 +5,6 @@ dist = {
     0 : ["COM"]
 }
 
-
 f = open("input_day06.txt")
 #f = open("example.txt")
 for l in f:
@@ -20,5 +19,5 @@ while d in dist and dist[d]:
         for o in orbits[c]:
             dist[d + 1].append(o)
     d += 1
-    
+
 print(sum(d * len(dist[d]) for d in dist))

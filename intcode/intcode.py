@@ -1,13 +1,19 @@
 import operator
+from collections import defaultdict
 from enum import Enum
 
 Mode = Enum('Mode', 'POS IMM REL', start=0)
 Opcode = Enum('Opcode', 'Add Mul Input Output JumpIfTrue JumpIfFalse LessThan Equals SetBase')
 
+def open_file(filename):
+    f = open(filename)
+    l = [int(n) for n in f.readline().strip().split(",")]
+    return defaultdict(int, enumerate(l))
+
 class IntCodeMachine:
-    def __init__(self, instructions, onread=None, onwrite=lambda x: None):
+    def __init__(self, memory, onread=None, onwrite=lambda x: None):
         self.onread, self.onwrite  = onread, onwrite
-        self.memory = instructions
+        self.memory = memory
         self.pos, self.offset = 0, 0
         self.halted = False
 
