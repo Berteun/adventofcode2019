@@ -11,7 +11,7 @@ StackFrame = namedtuple('StackFrame', ['position', 'direction', 'depth', 'revers
 tiles = {
     0: '?',
     1: ' ',
-    2: '#',
+    2: '█',
     3: 'O',
 }
 
@@ -131,6 +131,7 @@ def run():
     try:
         machine.run()
     except RuntimeError:
+        draw_map(robot.map, (0, 0))
         print("Part 1", robot.solution, robot.oxygen)
 
     oxygen(robot.map, robot.oxygen)
