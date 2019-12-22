@@ -6,11 +6,16 @@ class Techniques(Enum):
     INCR = 2,
 
 def modinv(n, deck_size):
+    # Fermat: n^deck_size = n % deck_size
+    # but we want n^(-1) s.t. n^(-1) * n = 1 % deck_size, so:
+    # n^(deck_size - 1) = 1 % deck_size
+    # And therefore:
+    # n^(deck_size - 2) * n = 1 % deck_size, so
+    # n^(deck_size - 2) => our inverse (this is only if deck_size is prime)
     return pow(n, deck_size - 2, deck_size)
 
 def read_input():
     f = open("input_day22.txt");
-    #f = open("example01.txt")
     instructions = []
     for l in f:
         parts = l.rstrip('\n').split(' ')
@@ -44,8 +49,13 @@ def shuffle_backward(deck_size, card, instructions):
         if instruction == Techniques.CUT:
             position = (position + count) % deck_size
         if instruction == Techniques.INCR:
-            mod_inv = modinv(count, deck_size)
-            position = (position * mod_inv) % deck_size
+            # We had:
+            # pos_new = (pos_old * count) % deck_size,
+            # so, reversing (all % deck_size)
+            # pos_new * count^1 = pos_old * count * count^1
+            # pos_old = pow_new * count^1
+            count_inv = modinv(count, deck_size)
+            position = (position * count_inv) % deck_size
     return position
 
 def gen_shuffle_forward(deck_size, instructions):
@@ -77,9 +87,9 @@ def gen_shuffle_backward(deck_size, instructions):
         if instruction == Techniques.CUT:
             position[1] = (position[1] + count)
         if instruction == Techniques.INCR:
-            mod_inv = modinv(count, deck_size)
-            position[0] *= mod_inv
-            position[1] *= mod_inv
+            count_inv = modinv(count, deck_size)
+            position[0] *= count_inv
+            position[1] *= count_inv
 
     return [position[0] % deck_size, position[1] % deck_size]
 
