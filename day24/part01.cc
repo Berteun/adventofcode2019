@@ -9,7 +9,7 @@ constexpr int field_width = 5;
 constexpr int field_size = field_height * field_width;
 constexpr char const* INPUT = "input_day24.txt";
 
-std::array<int, field_size> generate_masks() {
+constexpr std::array<int, field_size> generate_masks() {
     auto masks = std::array<int, 25>();
     for (int y = 0; y < field_height; ++y) {
         for (int x = 0; x < field_width; ++x) {
