@@ -41,7 +41,7 @@ class IntCodeMachine:
 
     def get_args(self, n, modes):
         return tuple(self.get_arg(modes[i], self.memory[self.pos + i]) for i in range(n))
-    
+
     def get_args_and_output(self, n, modes):
         args, addr = self.get_args(n, modes), self.memory[self.pos + n]
         oaddr = addr + (self.offset if modes[n] == Mode.REL else 0)
