@@ -1,0 +1,25 @@
+                        SCIENCE LAB
+                        mug
+  SICK BAY HOT CHOC HW  WARP DRIVE          STABLES  OBSERVATORY  HOLODECK
+           hat      pn  weather machinek                          ice cream
+  NAVIGAT  HULL         ENGINEERING         PASSAGES
+
+  ARCADE   KITCHEN
+
+  CREW     GIFT CTR
+           mutex
+           STORAGE   CORRIDOR
+           boulder
+                     CHECKPOINT  FLOOR
+
+NONE => Too heavy
+
+weather machine  => -
+prime number     => -
+
+pn + fh => -
+pn + mug + fh + sand + boulder + mutex + astronaut ice cream=> _
+sand + ice cream + festive hat + boulder + mutex => -
+
+
+=> sand astronaut ice cream boulder mutex
