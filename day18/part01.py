@@ -7,16 +7,19 @@ class DynamicGraph:
 
     def neighbours(self, node, keys):
         neighbours = []
-        for nb, (d, nb_preds) in self.graph[node].items():
-            keys_needed = set(d.lower() for d in nb_preds if 'A' < d < 'Z')
+        for nb, (d, nb_doors) in self.graph[node].items():
+            keys_needed = set(d.lower() for d in nb_doors if 'A' <= d <= 'Z')
             if keys.issuperset(keys_needed):
                 neighbours.append((nb, d))
         return neighbours
 
 def read_input():
-    #f = open("input_day18.txt")
+    f = open("input_day18.txt")
     #f = open("example01.txt")
-    f = open("example02.txt")
+    #f = open("example02.txt")
+    #f = open("example03.txt")
+    #f = open("example04.txt")
+    #f = open("example05.txt")
     maze = [list(l.strip('\n')) for l in f]
     for (y, r) in enumerate(maze):
         if '@' in r:
@@ -63,7 +66,7 @@ def dijkstra(graph, pois, rev_pois, start):
                 prev[nb].append(node)
                 q.append((nb, d + length))
 
-    return { poi : (dist[pois[poi]], frozenset([rev_pois[q] for q in prev[pois[poi]] if q in rev_pois and 'a' <= rev_pois[q] <= 'z'])) for poi in pois }
+    return { poi : (dist[pois[poi]], frozenset([rev_pois[q] for q in prev[pois[poi]] if q in rev_pois and 'A' <= rev_pois[q] <= 'Z'])) for poi in pois }
 
 def dijkstra_all(maze, pois):
     rev_pois = { pois[poi] : poi for poi in pois }
@@ -71,6 +74,13 @@ def dijkstra_all(maze, pois):
     for poi in pois:
         graph[poi] = dijkstra(maze, pois, rev_pois, poi)
     return graph
+
+def print_graph(graph, pois):
+    for (node) in graph:
+        print("Node {}".format(node))
+        for nb in sorted(graph[node]):
+            dist, doors = graph[node][nb]
+            print("    {}: {:3d}, Doors: {{{}}}".format(nb, dist, ', '.join(doors)))
 
 def solve(full_graph, pois):
     dgraph = DynamicGraph(full_graph)
@@ -81,11 +91,14 @@ def solve(full_graph, pois):
     heapq.heappush(queue, (0, frozenset(), '@'))
     while queue:
         d, keys, node = heapq.heappop(queue)
+        #print(d, keys, node)
         if (node, keys) in dist and dist[(node, keys)] < d:
             continue
         for (nb, length) in dgraph.neighbours(node, keys):
             if 'a' <= nb <= 'z':
                 new_keys = frozenset(keys | set([nb]))
+            else:
+                new_keys = keys.copy()
             if (nb, new_keys) not in dist or dist[(nb, new_keys)] > d + length:
                 dist[(nb, new_keys)] = d + length
                 prev[(nb, new_keys)] = prev[(node, keys)][:]
@@ -96,12 +109,14 @@ def solve(full_graph, pois):
 def run():
     maze, start = read_input()
     graph, pois = build_graph(maze)
-    print(pois)
     full_graph = dijkstra_all(graph, pois)
+    #print_graph(full_graph, pois)
     dist, prev = solve(full_graph, pois)
     all_keys = frozenset(k for k in pois if 'a' <= k <= 'z')
-    for (poi, keys) in dist:
-        if all_keys == keys:
-            print(poi, dist[poi, keys], prev[poi, keys])
+    all_routes = [(dist[poi, keys], prev[poi, keys], poi) for (poi, keys) in dist if keys == all_keys]
+
+    best = min(all_routes)
+    print("Best route {} steps, ends at {}".format(best[0], best[2]))
+
 if __name__ == '__main__':
     run()
