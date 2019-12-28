@@ -33,11 +33,12 @@ class IntCodeMachine:
             self.step()
 
     def get_arg(self, mode, val):
-        return {
-            Mode.POS: lambda val: self.memory[val],
-            Mode.IMM: lambda val: val,
-            Mode.REL: lambda val: self.memory[self.offset + val],
-        }[mode](val)
+        if mode == Mode.POS:
+            return self.memory[val]
+        elif mode == Mode.IMM:
+            return val
+        else:
+            return self.memory[self.offset + val]
 
     def get_args(self, n, modes):
         return tuple(self.get_arg(modes[i], self.memory[self.pos + i]) for i in range(n))
@@ -70,14 +71,21 @@ class IntCodeMachine:
         self.pos += 1
 
     def eval(self, opcode, modes):
-        return {
-            Opcode.Add:      (lambda modes: self.eval_op(operator.add, modes)),
-            Opcode.Mul:      (lambda modes: self.eval_op(operator.mul, modes)),
-            Opcode.LessThan: (lambda modes: self.eval_op(operator.lt, modes)),
-            Opcode.Equals:   (lambda modes: self.eval_op(operator.eq, modes)),
-            Opcode.JumpIfTrue:  (lambda modes: self.eval_jump(True, modes)),
-            Opcode.JumpIfFalse: (lambda modes: self.eval_jump(False, modes)),
-            Opcode.Input:   self.eval_inp,
-            Opcode.Output:  self.eval_out,
-            Opcode.SetBase: self.eval_set_base,
-        }[opcode](modes)
+        if opcode == Opcode.Add:
+            self.eval_op(operator.add, modes)
+        elif opcode == Opcode.Mul:
+            self.eval_op(operator.mul, modes)
+        elif opcode == Opcode.LessThan:
+            self.eval_op(operator.lt, modes)
+        elif opcode == Opcode.Equals:
+            self.eval_op(operator.eq, modes)
+        elif opcode == Opcode.JumpIfTrue:
+            self.eval_jump(True, modes)
+        elif opcode == Opcode.JumpIfFalse:
+            self.eval_jump(False, modes)
+        elif opcode == Opcode.Input:
+            self.eval_inp(modes)
+        elif opcode == Opcode.Output:
+            self.eval_out(modes)
+        elif opcode == Opcode.SetBase:
+            self.eval_set_base(modes)
