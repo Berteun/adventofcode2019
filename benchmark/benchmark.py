@@ -4,6 +4,12 @@ from intcode import IntCodeMachine
 from collections import defaultdict
 import time
 
+def make_memory(code):
+    # Slow
+    # return defaultdict(int, enumerate(code))
+    # Also slow, but a bit faster
+    return code + ([0] * 1000000)
+
 benchmarks = {
     'sum_of_primes' : {
         'input': [100000],
@@ -24,7 +30,7 @@ benchmarks = {
 
 for name, fields in benchmarks.items():
     answers = []
-    machine = IntCodeMachine(defaultdict(int, enumerate(fields['code'])), fields['input'].pop, answers.append)
+    machine = IntCodeMachine(make_memory(fields['code']), fields['input'].pop, answers.append)
     start = time.time()
     machine.run()
     end = time.time()
